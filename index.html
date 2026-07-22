@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pendaftaran Surabaya — Indomaret Fun Run 2026</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Anton&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<style>
+  :root {
+    --blue: #0055A4; --blue-dark: #003E7A; --blue-light: #2D7DE2; --blue-soft: #EFF6FF;
+    --cream: #FFF8F0; --ink: #1A1A1A; --muted: #6B6B73; --line: #E8E8EC; --bg: #FAFAFA;
+    --emerald: #10B981; --gold: #F5A623;
+  }
+  * { -webkit-font-smoothing: antialiased; box-sizing: border-box; }
+  html, body { background: var(--bg); color: var(--ink); font-family: 'Plus Jakarta Sans', sans-serif; }
+  .font-display { font-family: 'Anton', sans-serif; letter-spacing: 0.01em; }
+  .font-mono { font-family: 'JetBrains Mono', monospace; }
+  
+  /* Initial Professional Loading */
+  #initialLoading {
+    position: fixed; inset: 0; z-index: 9999; 
+    background: radial-gradient(circle at center, #003E7A 0%, #001a33 100%);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+  }
+  #initialLoading.hide { opacity: 0; visibility: hidden; }
+  #initialLoading::before {
+    content: ''; position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(45, 125, 226, 0.1) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(45, 125, 226, 0.1) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: radial-gradient(circle at center, black, transparent 70%);
+    -webkit-mask-image: radial-gradient(circle at center, black, transparent 70%);
+  }
+  .init-logo {
+    width: 90px; height: 90px; border-radius: 18px; object-fit: cover;
+    box-shadow: 0 0 40px rgba(45, 125, 226, 0.6);
+    animation: heartbeat 1.5s ease-in-out infinite; z-index: 10;
+  }
+  @keyframes heartbeat {
+    0% { transform: scale(1); box-shadow: 0 0 30px rgba(45,125,226,0.4); }
+    50% { transform: scale(1.1); box-shadow: 0 0 50px rgba(45,125,226,0.8); }
+    100% { transform: scale(1); box-shadow: 0 0 30px rgba(45,125,226,0.4); }
+  }
+  .init-track {
+    width: 260px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; overflow: hidden; margin-top: 40px; z-index: 10;
+  }
+  .init-fill {
+    height: 100%; width: 0%; background: linear-gradient(90deg, #2D7DE2, #FFFFFF); border-radius: 2px;
+    box-shadow: 0 0 10px rgba(255,255,255,0.8);
+    animation: loadProgress 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+  @keyframes loadProgress { 0% { width: 0%; } 60% { width: 80%; } 100% { width: 100%; } }
+  .init-text { color: white; font-family: 'Anton', sans-serif; letter-spacing: 0.15em; margin-top: 25px; font-size: 1.3rem; z-index: 10; }
+  .init-subtext { color: rgba(255,255,255,0.6); font-size: 0.75rem; margin-top: 8px; font-family: 'JetBrains Mono', monospace; z-index: 10; }
+
+  .hero-pattern { background-image: url('banner.png'); background-size: cover; background-position: center; background-repeat: no-repeat; position: relative; background-color: #0b1a33; }
+  .hero-pattern::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(6, 26, 48, 0.92) 0%, rgba(6, 26, 48, 0.75) 50%, rgba(6, 26, 48, 0.5) 100%); z-index: 0; }
+  .dot-pattern { background-image: radial-gradient(rgba(255,255,255,0.15) 1px, transparent 1px); background-size: 20px 20px; }
+  
+  .step-node { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+  .step-node.active { background: var(--blue); color: white; border-color: var(--blue); box-shadow: 0 4px 14px rgba(0,85,164,0.35); }
+  .step-node.done { background: var(--emerald); color: white; border-color: var(--emerald); }
+  .step-line-fill { transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+  
+  .field { background: white; border: 1.5px solid var(--line); border-radius: 10px; transition: all 0.2s; font-size: 15px; width: 100%; }
+  .field:focus { border-color: var(--blue); box-shadow: 0 0 0 4px rgba(0,85,164,0.1); outline: none; }
+  .field:read-only { background: #f8f8f8; color: var(--muted); cursor: not-allowed; }
+  .field-label { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+  .field-label .req { color: var(--blue); }
+  
+  .card { background: white; border-radius: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.04); }
+  .btn-primary { background: var(--blue); color: white; font-weight: 700; border-radius: 10px; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,85,164,0.25); }
+  .btn-primary:hover { background: var(--blue-dark); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0,85,164,0.35); }
+  .btn-secondary { background: white; color: var(--ink); border: 1.5px solid var(--line); font-weight: 600; border-radius: 10px; transition: all 0.2s; }
+  .btn-secondary:hover { border-color: var(--ink); background: #F5F5F7; }
+  
+  .step-panel { display: none; }
+  .step-panel.active { display: block; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  
+  .radio-card { border: 1.5px solid var(--line); border-radius: 12px; cursor: pointer; transition: all 0.2s; background: white; user-select: none; }
+  .radio-card:hover { border-color: #C0C0C8; }
+  .radio-card.selected { border-color: var(--blue); background: var(--blue-soft); box-shadow: 0 0 0 3px rgba(0,85,164,0.1); }
+  
+  .qr-frame { background: white; padding: 16px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); position: relative; }
+  .qr-frame::before, .qr-frame::after { content: ''; position: absolute; width: 24px; height: 24px; border: 3px solid var(--blue); }
+  .qr-frame::before { top: -3px; left: -3px; border-right: none; border-bottom: none; border-top-left-radius: 8px; }
+  .qr-frame::after { bottom: -3px; right: -3px; border-left: none; border-top: none; border-bottom-right-radius: 8px; }
+  
+  .check-circle { stroke-dasharray: 166; stroke-dashoffset: 166; animation: drawCircle 0.6s cubic-bezier(0.65, 0, 0.45, 1) 0.2s forwards; }
+  .check-mark { stroke-dasharray: 48; stroke-dashoffset: 48; animation: drawCheck 0.4s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards; }
+  @keyframes drawCircle { to { stroke-dashoffset: 0; } }
+  @keyframes drawCheck { to { stroke-dashoffset: 0; } }
+  
+  @keyframes confettiFall { 0% { transform: translateY(-100vh) rotate(0); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
+  .confetti { position: fixed; width: 10px; height: 10px; top: 0; z-index: 90; animation: confettiFall 3s linear forwards; pointer-events: none; }
+  
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--ink); color: white; padding: 12px 20px; border-radius: 10px; font-size: 14px; z-index: 100; opacity: 0; transition: all 0.3s; box-shadow: 0 8px 24px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 8px; }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  
+  .pulse-dot { animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.3); } }
+  
+  .marquee-track { display: flex; gap: 3rem; animation: marquee 25s linear infinite; white-space: nowrap; }
+  @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+  
+  .float-1 { animation: float1 7s ease-in-out infinite; }
+  .float-2 { animation: float1 9s ease-in-out infinite reverse; }
+  @keyframes float1 { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-15px) rotate(3deg); } }
+  
+  .text-glow { text-shadow: 0 0 30px rgba(45,125,226,0.5); }
+  
+  .summary-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px dashed var(--line); }
+  .summary-row:last-child { border-bottom: none; }
+  
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 60; display: none; align-items: center; justify-content: center; padding: 1rem; }
+  .modal-overlay.show { display: flex; animation: fadeIn 0.2s; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  
+  input[type="file"]::-webkit-file-upload-button { cursor: pointer; }
+
+  @media print {
+    body * { visibility: hidden; }
+    .step-panel[data-panel="4"], .step-panel[data-panel="4"] * { visibility: visible; }
+    .step-panel[data-panel="4"] { position: absolute; left: 0; top: 0; width: 100%; padding: 20px; }
+    .no-print { display: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Initial Professional Loading -->
+<div id="initialLoading">
+  <img src="logo.png" class="init-logo" onerror="this.src='https://via.placeholder.com/90/0055A4/FFFFFF?text=I'" alt="Logo Indomaret">
+  <div class="init-track"><div class="init-fill"></div></div>
+  <div class="init-text">INDOMARET FUN RUN 2026</div>
+  <div class="init-subtext">MEMUAT FORMULIR SURABAYA...</div>
+</div>
+
+<header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-[var(--line)] no-print">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <img alt="Logo" class="w-10 h-10 rounded-lg object-cover shadow-md" onerror="this.src='https://via.placeholder.com/40/0055A4/FFFFFF?text=I'" src="logo.png"/>
+      <div>
+        <div class="font-display text-base leading-none tracking-wider">INDOMARET</div>
+        <div class="text-[10px] tracking-[0.25em] text-[var(--blue)] font-semibold mt-0.5">FUN RUN · SURABAYA 2026</div>
+      </div>
+    </div>
+    <div class="hidden sm:flex items-center gap-4 text-sm">
+      <div class="flex items-center gap-2 text-[var(--muted)]"><i class="fa-solid fa-phone text-xs"></i><span class="font-mono">0812-6789-1011</span></div>
+      <div class="w-px h-5 bg-[var(--line)]"></div>
+      <a class="text-[var(--muted)] hover:text-[var(--blue)] transition" href="#"><i class="fa-brands fa-instagram"></i></a>
+    </div>
+  </div>
+</header>
+
+<section class="hero-pattern relative overflow-hidden no-print">
+  <div class="absolute inset-0 dot-pattern opacity-30 z-0"></div>
+  <div class="absolute top-10 right-10 w-32 h-32 rounded-full bg-[var(--blue)] opacity-30 blur-3xl float-1 z-0"></div>
+  <div class="absolute bottom-10 left-20 w-40 h-40 rounded-full bg-[var(--gold)] opacity-10 blur-3xl float-2 z-0"></div>
+  <div class="relative max-w-6xl mx-auto px-4 sm:px-6 py-10 md:py-14 z-10">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <div>
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--blue)]/20 border border-[var(--blue)]/30 mb-4 backdrop-blur-sm">
+          <span class="w-1.5 h-1.5 rounded-full bg-[var(--blue-light)] pulse-dot"></span>
+          <span class="text-[11px] tracking-[0.2em] text-blue-200 font-semibold">6000 TIKET · KUOTA TERBATAS</span>
+        </div>
+        <h1 class="font-display text-4xl md:text-6xl text-white leading-[0.9]">
+          CATCH THE FUN<br/><span class="text-[var(--blue-light)] text-glow">RUN THE CITY</span>
+        </h1>
+        <p class="mt-3 text-white/80 text-sm md:text-base max-w-md font-medium">Lengkapi data Anda dalam 4 langkah mudah untuk mengamankan slot Indomaret Fun Run Surabaya 2026 di Bungkul Park.</p>
+      </div>
+      <div class="flex items-center gap-4">
+        <div class="text-center"><div class="font-display text-3xl text-white">25</div><div class="text-[10px] tracking-widest text-white/70">JULI 2026</div></div>
+        <div class="w-px h-12 bg-white/30"></div>
+        <div class="text-center"><div class="font-display text-3xl text-white">10K</div><div class="text-[10px] tracking-widest text-white/70">SURABAYA</div></div>
+        <div class="w-px h-12 bg-white/30"></div>
+        <div class="text-center"><div class="font-display text-3xl text-[var(--gold)]">MOTOR</div><div class="text-[10px] tracking-widest text-white/70">GRAND PRIZE</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="relative border-t border-white/10 py-3 overflow-hidden bg-black/40 z-10">
+    <div class="marquee-track text-xs tracking-[0.2em] text-white/60 font-semibold">
+      <span>● 25 JULI 2026</span><span>● REGULAR RP 125.000</span><span>● MEMBER RP 100.000 (MIN BELANJA 50K)</span><span>● HADIAH MOTOR &amp; SMARTWATCH</span><span>● ENTERTAINMENT: COCO LENSE &amp; WIZZ BAKER</span><span>● GOODIE BAG</span><span>● MEDALI FINISHER</span><span>● JERSEY EKSKLUSIF</span>
+      <span>● 25 JULI 2026</span><span>● REGULAR RP 125.000</span><span>● MEMBER RP 100.000 (MIN BELANJA 50K)</span><span>● HADIAH MOTOR &amp; SMARTWATCH</span><span>● ENTERTAINMENT: COCO LENSE &amp; WIZZ BAKER</span><span>● GOODIE BAG</span><span>● MEDALI FINISHER</span><span>● JERSEY EKSKLUSIF</span>
+    </div>
+  </div>
+</section>
+
+<main id="formSection" class="max-w-6xl mx-auto px-4 sm:px-6 py-8 md:py-12 relative">
+  <div class="mb-8 md:mb-12 no-print">
+    <div class="flex items-center justify-between max-w-3xl mx-auto relative">
+      <div class="absolute top-6 left-[12.5%] right-[12.5%] h-1 bg-[var(--line)] rounded-full -z-0">
+        <div class="step-line-fill h-full bg-gradient-to-r from-[var(--blue)] to-[var(--emerald)] rounded-full" id="progressLine" style="width: 0%"></div>
+      </div>
+      <div class="relative z-10 flex flex-col items-center flex-1">
+        <div class="step-node active w-12 h-12 rounded-full bg-white border-2 border-[var(--line)] flex items-center justify-center font-display text-base" data-step="1">01</div>
+        <div class="mt-2 text-[11px] md:text-xs font-semibold text-center step-label">Data Diri</div>
+      </div>
+      <div class="relative z-10 flex flex-col items-center flex-1">
+        <div class="step-node w-12 h-12 rounded-full bg-white border-2 border-[var(--line)] flex items-center justify-center font-display text-base text-[var(--muted)]" data-step="2">02</div>
+        <div class="mt-2 text-[11px] md:text-xs font-semibold text-center text-[var(--muted)] step-label">Alamat &amp; Kontak</div>
+      </div>
+      <div class="relative z-10 flex flex-col items-center flex-1">
+        <div class="step-node w-12 h-12 rounded-full bg-white border-2 border-[var(--line)] flex items-center justify-center font-display text-base text-[var(--muted)]" data-step="3">03</div>
+        <div class="mt-2 text-[11px] md:text-xs font-semibold text-center text-[var(--muted)] step-label">Pembayaran</div>
+      </div>
+      <div class="relative z-10 flex flex-col items-center flex-1">
+        <div class="step-node w-12 h-12 rounded-full bg-white border-2 border-[var(--line)] flex items-center justify-center font-display text-base text-[var(--muted)]" data-step="4">04</div>
+        <div class="mt-2 text-[11px] md:text-xs font-semibold text-center text-[var(--muted)] step-label">Selesai</div>
+      </div>
+    </div>
+  </div>
+  <div class="card p-6 md:p-10 relative z-10">
+    <form id="regForm" onsubmit="return false;">
+      <div class="step-panel active" data-panel="1">
+        <div class="flex items-center gap-3 mb-1">
+          <div class="w-1 h-7 bg-[var(--blue)] rounded-full"></div>
+          <h2 class="font-display text-2xl md:text-3xl">DATA DIRI PESERTA</h2>
+        </div>
+        <p class="text-sm text-[var(--muted)] mb-8 ml-4">Pastikan data sesuai dengan KTP/SIM yang masih berlaku.</p>
+        <div class="grid md:grid-cols-2 gap-5">
+          <div class="md:col-span-2">
+            <label class="field-label">Nama Lengkap <span class="req">*</span></label>
+            <input class="field px-4 py-3" name="nama" placeholder="Contoh: Budi Santoso" required="" type="text"/>
+          </div>
+          <div>
+            <label class="field-label">NIK / No. KTP <span class="req">*</span></label>
+            <input class="field px-4 py-3 font-mono" maxlength="16" name="nik" placeholder="16 digit NIK" required="" type="text"/>
+          </div>
+          <div>
+            <label class="field-label">Tanggal Lahir <span class="req">*</span></label>
+            <input class="field px-4 py-3" name="tgl_lahir" required="" type="date"/>
+          </div>
+          <div>
+            <label class="field-label">Jenis Kelamin <span class="req">*</span></label>
+            <select class="field px-4 py-3" name="jenis_kelamin" required="">
+              <option value="">Pilih...</option>
+              <option>Laki-laki</option>
+              <option>Perempuan</option>
+            </select>
+          </div>
+          <div>
+            <label class="field-label">No. WhatsApp <span class="req">*</span></label>
+            <div class="relative">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--muted)] font-mono text-sm">+62</span>
+              <input class="field pl-12 pr-4 py-3 font-mono" name="wa" placeholder="812 3456 7890" required="" type="tel"/>
+            </div>
+          </div>
+          <div>
+            <label class="field-label">Email Aktif <span class="req">*</span></label>
+            <input class="field px-4 py-3" id="emailInput" name="email" placeholder="email@contoh.com" required="" type="email"/>
+          </div>
+          <div>
+            <label class="field-label">Kategori Tiket <span class="req">*</span></label>
+            <select class="field px-4 py-3" id="categorySelect" name="kategori" onchange="updatePrice()" required="">
+              <option selected="" value="125000">Regular - Rp 125.000</option>
+              <option value="100000">Member Indomaret - Rp 100.000 (Min. belanja 50K)</option>
+            </select>
+          </div>
+          <div>
+            <label class="field-label">Ukuran jersey <span class="req">*</span>
+              <button class="ml-auto text-xs text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1" onclick="openSizeChart()" type="button">
+                <i class="fa-solid fa-ruler"></i> Lihat Size Chart
+              </button>
+            </label>
+            <div class="grid grid-cols-5 gap-2" id="jerseySizes">
+              <label class="radio-card text-center py-3 font-semibold text-sm"><input class="hidden" name="ukuran_jersey" required="" type="radio" value="S"/>S</label>
+              <label class="radio-card text-center py-3 font-semibold text-sm selected"><input checked="" class="hidden" name="ukuran_jersey" type="radio" value="M"/>M</label>
+              <label class="radio-card text-center py-3 font-semibold text-sm"><input class="hidden" name="ukuran_jersey" type="radio" value="L"/>L</label>
+              <label class="radio-card text-center py-3 font-semibold text-sm"><input class="hidden" name="ukuran_jersey" type="radio" value="XL"/>XL</label>
+              <label class="radio-card text-center py-3 font-semibold text-sm"><input class="hidden" name="ukuran_jersey" type="radio" value="XXL"/>XXL</label>
+            </div>
+          </div>
+          <div class="md:col-span-2">
+            <label class="field-label">Nama Bib ( maks 12 karakter )</label>
+            <input class="field px-4 py-3" maxlength="12" name="nama_bib" placeholder="Nama yang dicetak di nomor dada" type="text"/>
+            <p class="text-xs text-[var(--muted)] mt-1.5">Kosongkan jika ingin menggunakan nama lengkap.</p>
+          </div>
+        </div>
+        <div class="flex justify-end mt-8 pt-6 border-t border-[var(--line)]">
+          <button class="btn-primary px-8 py-3.5 inline-flex items-center gap-2" onclick="nextStep(1)" type="button">LANJUT <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+      </div>
+      
+      <div class="step-panel" data-panel="2">
+        <div class="flex items-center gap-3 mb-1">
+          <div class="w-1 h-7 bg-[var(--blue)] rounded-full"></div>
+          <h2 class="font-display text-2xl md:text-3xl">ALAMAT &amp; KONTAK DARURAT</h2>
+        </div>
+        <p class="text-sm text-[var(--muted)] mb-8 ml-4">Data alamat untuk pengiriman paket peserta dan kontak darurat saat event.</p>
+        <div class="grid md:grid-cols-2 gap-5">
+          <div class="md:col-span-2">
+            <label class="field-label">Alamat Lengkap <span class="req">*</span></label>
+            <textarea class="field px-4 py-3" name="alamat" placeholder="Jalan, nomor rumah, RT/RW, kelurahan" required="" rows="2"></textarea>
+          </div>
+          <div>
+            <label class="field-label">Kota / Kabupaten <span class="req">*</span></label>
+            <input class="field px-4 py-3" id="inputKota" name="kota" value="Surabaya" readonly="" type="text"/>
+          </div>
+          <div>
+            <label class="field-label">Provinsi <span class="req">*</span></label>
+            <input class="field px-4 py-3" id="inputProvinsi" name="provinsi" value="Jawa Timur" readonly="" type="text"/>
+          </div>
+          <div>
+            <label class="field-label">Kode Pos</label>
+            <input class="field px-4 py-3 font-mono" maxlength="5" name="kode_pos" placeholder="Contoh: 60231" type="text"/>
+          </div>
+          <div>
+            <label class="field-label">Golongan Darah <span class="req">*</span></label>
+            <select class="field px-4 py-3" name="gol_darah" required="">
+              <option value="">Pilih...</option>
+              <option>A</option><option>B</option><option>AB</option><option>O</option><option>Tidak Tahu</option>
+            </select>
+          </div>
+        </div>
+        <div class="mt-8 pt-6 border-t border-[var(--line)]">
+          <div class="flex items-center gap-2 mb-1">
+            <i class="fa-solid fa-triangle-exclamation text-[var(--blue)]"></i>
+            <h3 class="font-semibold text-base">Kontak Darurat</h3>
+          </div>
+          <p class="text-sm text-[var(--muted)] mb-6">Hubungi keluarga/kerabat jika terjadi keadaan darurat saat event berlangsung.</p>
+          <div class="grid md:grid-cols-2 gap-5">
+            <div>
+              <label class="field-label">Nama Kontak Darurat <span class="req">*</span></label>
+              <input class="field px-4 py-3" name="nama_darurat" placeholder="Contoh: Siti Aminah" required="" type="text"/>
+            </div>
+            <div>
+              <label class="field-label">Hubungan <span class="req">*</span></label>
+              <select class="field px-4 py-3" name="hubungan_darurat" required="">
+                <option value="">Pilih...</option>
+                <option>Orang Tua</option><option>Suami / Istri</option><option>Saudara</option><option>Anak</option><option>Kerabat Lainnya</option><option>Teman</option>
+              </select>
+            </div>
+            <div class="md:col-span-2">
+              <label class="field-label">No. HP Kontak Darurat <span class="req">*</span></label>
+              <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--muted)] font-mono text-sm">+62</span>
+                <input class="field pl-12 pr-4 py-3 font-mono" name="hp_darurat" placeholder="812 3456 7890" required="" type="tel"/>
+              </div>
+            </div>
+            <div class="md:col-span-2">
+              <label class="field-label">Riwayat Penyakit / Alergi</label>
+              <textarea class="field px-4 py-3" name="riwayat_penyakit" placeholder="Contoh: Asma, alergi kacang, dll. Kosongkan jika tidak ada." rows="2"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="flex justify-between mt-8 pt-6 border-t border-[var(--line)]">
+          <button class="btn-secondary px-6 py-3.5 inline-flex items-center gap-2" onclick="prevStep(2)" type="button"><i class="fa-solid fa-arrow-left"></i> KEMBALI</button>
+          <button class="btn-primary px-8 py-3.5 inline-flex items-center gap-2" onclick="nextStep(2)" type="button">LANJUT <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+      </div>
+      
+      <div class="step-panel" data-panel="3">
+        <div class="flex items-center gap-3 mb-1">
+          <div class="w-1 h-7 bg-[var(--blue)] rounded-full"></div>
+          <h2 class="font-display text-2xl md:text-3xl">PEMBAYARAN</h2>
+        </div>
+        <p class="text-sm text-[var(--muted)] mb-8 ml-4">Scan QRIS di bawah ini dan unggah bukti pembayaran untuk konfirmasi pendaftaran.</p>
+        <div class="grid lg:grid-cols-5 gap-8">
+          <div class="lg:col-span-3 space-y-6">
+            <div class="bg-[var(--cream)] rounded-xl p-5 border border-[var(--line)]">
+              <div class="text-xs font-bold tracking-widest text-[var(--muted)] mb-4">RINGKASAN PESANAN</div>
+              <div class="summary-row">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-[var(--blue)]/10 flex items-center justify-center"><i class="fa-solid fa-ticket text-[var(--blue)]"></i></div>
+                  <div>
+                    <div class="font-semibold text-sm" id="summaryCategory">Regular</div>
+                    <div class="text-xs text-[var(--muted)]">Tiket Indomaret Fun Run 2026 - Surabaya</div>
+                  </div>
+                </div>
+                <div class="font-semibold text-sm" id="summaryPrice">Rp 125.000</div>
+              </div>
+              <div class="summary-row">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-[var(--blue)]/10 flex items-center justify-center"><i class="fa-solid fa-shirt text-[var(--blue)]"></i></div>
+                  <div>
+                    <div class="font-semibold text-sm">Jersey Eksklusif</div>
+                    <div class="text-xs text-[var(--muted)]" id="summaryJersey">Ukuran M</div>
+                  </div>
+                </div>
+                <div class="font-semibold text-sm">Termasuk</div>
+              </div>
+              <div class="summary-row">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-[var(--blue)]/10 flex items-center justify-center"><i class="fa-solid fa-medal text-[var(--blue)]"></i></div>
+                  <div>
+                    <div class="font-semibold text-sm">Medali Finisher</div>
+                    <div class="text-xs text-[var(--muted)]">Eksklusif 2026</div>
+                  </div>
+                </div>
+                <div class="font-semibold text-sm">Termasuk</div>
+              </div>
+              <div class="summary-row">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-[var(--blue)]/10 flex items-center justify-center"><i class="fa-solid fa-bag-shopping text-[var(--blue)]"></i></div>
+                  <div>
+                    <div class="font-semibold text-sm">Goodie Bag</div>
+                    <div class="text-xs text-[var(--muted)]">Berisi produk Indomaret</div>
+                  </div>
+                </div>
+                <div class="font-semibold text-sm">Termasuk</div>
+              </div>
+            </div>
+            <div>
+              <div class="text-xs font-bold tracking-widest text-[var(--muted)] mb-4">SCAN QRIS UNTUK PEMBAYARAN</div>
+              <div class="flex flex-col items-center gap-4 p-6 bg-[var(--cream)] rounded-xl border border-[var(--line)]">
+                <img alt="QRIS Pembayaran" class="w-48 h-48 object-contain" onerror="this.src='https://via.placeholder.com/200/FFFFFF/000000?text=QRIS+Image'" src="qris.png"/>
+                <div class="text-center">
+                  <p class="text-sm font-semibold">Scan via QRIS (Semua E-Wallet/Bank)</p>
+                  <p class="text-xs text-[var(--muted)] mt-1">Transfer sesuai nominal: <span class="font-bold text-[var(--blue)]" id="totalPriceInline">RP 125.000</span></p>
+                </div>
+              </div>
+            </div>
+            <div class="mt-6">
+              <label class="field-label">Upload Bukti Pembayaran <span class="req">*</span></label>
+              <input accept="image/*,application/pdf" class="field px-4 py-2.5 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[var(--blue-soft)] file:text-[var(--blue)] hover:file:bg-blue-100" id="buktiBayarInput" name="bukti_bayar" required="" type="file"/>
+              <p class="text-xs text-[var(--muted)] mt-1.5">Format: JPG, PNG, atau PDF (Maks 2MB)</p>
+            </div>
+          </div>
+          <div class="lg:col-span-2">
+            <div class="sticky top-24 bg-white border border-[var(--line)] rounded-xl p-6 shadow-sm">
+              <div class="text-xs font-bold tracking-widest text-[var(--muted)] mb-4">TOTAL PEMBAYARAN</div>
+              <div class="flex items-end justify-between mb-6">
+                <div class="text-sm text-[var(--muted)]">Total Bayar</div>
+                <div class="font-display text-3xl text-[var(--blue)]" id="totalPrice">RP 125.000</div>
+              </div>
+              <ul class="space-y-3 text-sm text-[var(--ink)] mb-6">
+                <li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-[var(--emerald)] mt-1"></i> Akses start 10K Fun Run</li>
+                <li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-[var(--emerald)] mt-1"></i> Jersey eksklusif &amp; goodie bag</li>
+                <li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-[var(--emerald)] mt-1"></i> Medali finisher</li>
+                <li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-[var(--emerald)] mt-1"></i> Asuransi selama event</li>
+              </ul>
+              <div class="flex items-start gap-2 mb-6 text-xs text-[var(--muted)] bg-[var(--blue-soft)] p-3 rounded-lg">
+                <i class="fa-solid fa-shield-halved text-[var(--blue)] mt-0.5"></i>
+                <span>Dengan melanjutkan, Anda menyetujui Syarat &amp; Ketentuan yang berlaku.</span>
+              </div>
+              <button class="btn-primary w-full py-4 inline-flex items-center justify-center gap-2" id="submitBtn" onclick="submitForm()" type="button">
+                <i class="fa-solid fa-cloud-arrow-up"></i> KONFIRMASI PEMBAYARAN
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="flex justify-start mt-8 pt-6 border-t border-[var(--line)]">
+          <button class="btn-secondary px-6 py-3.5 inline-flex items-center gap-2" onclick="prevStep(3)" type="button"><i class="fa-solid fa-arrow-left"></i> KEMBALI</button>
+        </div>
+      </div>
+      
+      <div class="step-panel" data-panel="4">
+        <div class="text-center max-w-2xl mx-auto py-8">
+          <div class="flex justify-center mb-6 no-print">
+            <svg height="80" viewbox="0 0 52 52" width="80">
+              <circle class="check-circle" cx="26" cy="26" fill="none" r="25" stroke="#10B981" stroke-width="3"></circle>
+              <path class="check-mark" d="M14 27 l8 8 l16 -16" fill="none" stroke="#10B981" stroke-width="4"></path>
+            </svg>
+          </div>
+          <h2 class="font-display text-3xl md:text-4xl mb-3">PENDAFTARAN BERHASIL!</h2>
+          <p class="text-[var(--muted)] mb-8">Selamat! Pembayaran Anda sedang diverifikasi. Tunjukkan QR Code tiket di bawah ini saat pengambilan race pack atau saat check-in di lokasi.</p>
+          <div class="flex justify-center mb-8">
+            <div class="qr-frame">
+              <img alt="QR Tiket" id="qrImage" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&amp;data=IMFR-2026-SURABAYA-001"/>
+            </div>
+          </div>
+          <div class="bg-[var(--cream)] rounded-xl p-6 border border-[var(--line)] text-left mb-8">
+            <div class="text-xs font-bold tracking-widest text-[var(--muted)] mb-4">DETAIL PESANAN</div>
+            <div class="summary-row"><span class="text-[var(--muted)]">No. Pendaftaran</span><span class="font-mono font-bold" id="regId">IMFR-2026-SURABAYA-XXXX</span></div>
+            <div class="summary-row"><span class="text-[var(--muted)]">Nama Peserta</span><span class="font-semibold" id="regName">Budi Santoso</span></div>
+            <div class="summary-row"><span class="text-[var(--muted)]">Kategori</span><span class="font-semibold" id="regCategory">Regular</span></div>
+            <div class="summary-row"><span class="text-[var(--muted)]">Lokasi Event</span><span class="font-semibold">Bungkul Park, Surabaya</span></div>
+            <div class="summary-row"><span class="text-[var(--muted)]">Status Pembayaran</span><span class="font-semibold text-[var(--gold)] flex items-center gap-1"><i class="fa-solid fa-spinner fa-spin"></i> Menunggu Verifikasi</span></div>
+          </div>
+          <div class="flex flex-col sm:flex-row gap-3 justify-center no-print">
+            <button class="btn-secondary px-6 py-3.5 inline-flex items-center justify-center gap-2" onclick="window.print()"><i class="fa-solid fa-print"></i> CETAK TIKET</button>
+            <button class="btn-primary px-8 py-3.5 inline-flex items-center justify-center gap-2" onclick="window.location.href='/'">SELESAI <i class="fa-solid fa-check"></i></button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</main>
+
+<div class="modal-overlay" id="sizeChartModal" onclick="if(event.target===this)closeSizeChart()">
+  <div class="bg-white rounded-2xl max-w-md w-full p-6 relative">
+    <button class="absolute top-4 right-4 text-[var(--muted)] hover:text-[var(--ink)]" onclick="closeSizeChart()"><i class="fa-solid fa-xmark text-xl"></i></button>
+    <h3 class="font-display text-2xl mb-4">SIZE CHART JERSEY</h3>
+    <table class="w-full text-sm border-collapse">
+      <thead>
+        <tr class="border-b border-[var(--line)]">
+          <th class="text-left py-2 font-semibold">Ukuran</th>
+          <th class="text-left py-2 font-semibold">Lebar Dada (cm)</th>
+          <th class="text-left py-2 font-semibold">Panjang (cm)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="border-b border-[var(--line)]"><td class="py-2 font-mono">S</td><td>48</td><td>68</td></tr>
+        <tr class="border-b border-[var(--line)]"><td class="py-2 font-mono">M</td><td>50</td><td>70</td></tr>
+        <tr class="border-b border-[var(--line)]"><td class="py-2 font-mono">L</td><td>52</td><td>72</td></tr>
+        <tr class="border-b border-[var(--line)]"><td class="py-2 font-mono">XL</td><td>54</td><td>74</td></tr>
+        <tr><td class="py-2 font-mono">XXL</td><td>56</td><td>76</td></tr>
+      </tbody>
+    </table>
+    <p class="text-xs text-[var(--muted)] mt-4">*Ukuran jersey bersifat unisex. Pastikan mengukur dengan tepat sebelum memilih.</p>
+  </div>
+</div>
+
+<div class="toast no-print" id="toast"><i class="fa-solid fa-circle-info"></i><span id="toastMsg">Pesan</span></div>
+
+<script>
+  // Hide Initial Loading after 2 seconds
+  window.addEventListener('load', function() {
+    setTimeout(() => {
+      document.getElementById('initialLoading').classList.add('hide');
+    }, 2000);
+  });
+
+  const CITY = 'SURABAYA';
+  let currentStep = 1;
+  const totalSteps = 4;
+
+  function goToStep(step) {
+    document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+    document.querySelector(`.step-panel[data-panel="${step}"]`).classList.add('active');
+    document.querySelectorAll('.step-node').forEach(node => {
+      const nodeStep = parseInt(node.dataset.step);
+      node.classList.remove('active', 'done', 'text-[var(--muted)]');
+      if (nodeStep < step) {
+        node.classList.add('done');
+        node.innerHTML = '<i class="fa-solid fa-check"></i>';
+      } else if (nodeStep === step) {
+        node.classList.add('active');
+        node.textContent = String(nodeStep).padStart(2, '0');
+      } else {
+        node.textContent = String(nodeStep).padStart(2, '0');
+        node.classList.add('text-[var(--muted)]');
+      }
+    });
+    const progress = ((step - 1) / (totalSteps - 1)) * 100;
+    document.getElementById('progressLine').style.width = progress + '%';
+    currentStep = step;
+    window.scrollTo({ top: document.querySelector('main').offsetTop - 80, behavior: 'smooth' });
+  }
+
+  function validateStep(step) {
+    const panel = document.querySelector(`.step-panel[data-panel="${step}"]`);
+    const requiredFields = panel.querySelectorAll('[required]');
+    let valid = true;
+    let firstInvalid = null;
+    requiredFields.forEach(field => {
+      if (!field.value.trim()) {
+        valid = false;
+        field.style.borderColor = '#EF4444';
+        if (!firstInvalid) firstInvalid = field;
+      } else {
+        field.style.borderColor = '';
+      }
+    });
+    if (step === 1) {
+      const nik = panel.querySelector('[name="nik"]');
+      if (nik && nik.value.length !== 16) {
+        showToast('NIK harus 16 digit', 'error');
+        valid = false;
+        firstInvalid = nik;
+      }
+    }
+    if (step === 3) {
+      const fileInput = document.getElementById('buktiBayarInput');
+      if (fileInput.files.length > 0) {
+        const fileSize = fileInput.files[0].size / 1024 / 1024; 
+        if (fileSize > 2) {
+          showToast('Ukuran file melebihi 2MB!', 'error');
+          valid = false;
+          firstInvalid = fileInput;
+        }
+      }
+    }
+    if (!valid && firstInvalid) {
+      firstInvalid.focus();
+      showToast('Mohon lengkapi data wajib (*)', 'error');
+    }
+    return valid;
+  }
+
+  function nextStep(from) {
+    if (!validateStep(from)) return;
+    if (from < totalSteps) {
+      goToStep(from + 1);
+      if (from + 1 === 3) updateSummary();
+    }
+  }
+
+  function prevStep(from) { if (from > 1) goToStep(from - 1); }
+
+  function updatePrice() {
+    const select = document.getElementById('categorySelect');
+    const price = parseInt(select.value);
+    const label = select.options[select.selectedIndex].text.split(' - ')[0];
+    const formattedPrice = 'RP ' + price.toLocaleString('id-ID');
+    document.getElementById('summaryCategory').textContent = label;
+    document.getElementById('summaryPrice').textContent = 'Rp ' + price.toLocaleString('id-ID');
+    document.getElementById('totalPrice').textContent = formattedPrice;
+    const inlinePrice = document.getElementById('totalPriceInline');
+    if (inlinePrice) inlinePrice.textContent = formattedPrice;
+  }
+
+  function updateSummary() {
+    updatePrice();
+    const jersey = document.querySelector('input[name="ukuran_jersey"]:checked');
+    if (jersey) document.getElementById('summaryJersey').textContent = 'Ukuran ' + jersey.value;
+  }
+
+  document.querySelectorAll('input[name="ukuran_jersey"]').forEach(input => {
+    input.addEventListener('change', function() {
+      document.querySelectorAll('input[name="ukuran_jersey"]').forEach(i => i.closest('label.radio-card').classList.remove('selected'));
+      this.closest('label.radio-card').classList.add('selected');
+    });
+  });
+
+  function openSizeChart() { document.getElementById('sizeChartModal').classList.add('show'); }
+  function closeSizeChart() { document.getElementById('sizeChartModal').classList.remove('show'); }
+
+  function showToast(message, type = 'info') {
+    const toast = document.getElementById('toast');
+    const msgEl = document.getElementById('toastMsg');
+    const iconEl = toast.querySelector('i');
+    msgEl.textContent = message;
+    const colors = { error: '#EF4444', success: '#10B981', info: '#1A1A1A' };
+    const icons = { error: 'fa-circle-exclamation', success: 'fa-circle-check', info: 'fa-circle-info' };
+    toast.style.background = colors[type] || colors.info;
+    iconEl.className = 'fa-solid ' + (icons[type] || icons.info);
+    toast.classList.add('show');
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => toast.classList.remove('show'), 3000);
+  }
+
+  function submitForm() {
+    if(!validateStep(3)) return;
+    const btn = document.getElementById('submitBtn');
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> MEMPROSES...';
+    btn.disabled = true;
+    setTimeout(() => {
+      const regId = 'IMFR-2026-' + CITY + '-' + Math.floor(1000 + Math.random() * 9000);
+      document.getElementById('regId').textContent = regId;
+      const form = document.getElementById('regForm');
+      document.getElementById('regName').textContent = form.nama.value || 'Peserta';
+      document.getElementById('regCategory').textContent = form.kategori.options[form.kategori.selectedIndex].text.split(' - ')[0];
+      document.getElementById('qrImage').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${regId}`;
+      goToStep(4);
+      launchConfetti();
+      showToast('Pendaftaran berhasil dikirim!', 'success');
+      btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> KONFIRMASI PEMBAYARAN';
+      btn.disabled = false;
+    }, 1500);
+  }
+
+  function launchConfetti() {
+    const colors = ['#0055A4', '#F5A623', '#10B981', '#2D7DE2'];
+    for (let i = 0; i < 50; i++) {
+      const confetti = document.createElement('div');
+      confetti.className = 'confetti';
+      confetti.style.left = Math.random() * 100 + 'vw';
+      confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+      confetti.style.animationDelay = Math.random() * 2 + 's';
+      confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+      document.body.appendChild(confetti);
+      setTimeout(() => confetti.remove(), 5000);
+    }
+  }
+
+  window.onload = updatePrice;
+</script>
+</body>
+</html>
